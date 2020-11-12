@@ -1,0 +1,19 @@
+{
+    "name": "aws-lambdas",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "node -e \"(async () => console.log(await require('./generic-start').handler({})))();\"",
+        "clientGetWBC": "node -e \"(async () => console.log(await require('./meeterClient').handler({'operation': 'getClient', 'payload': {'clientId': 'wbc'}})))();\"",
+        "userBadOperation": "node -e \"(async () => console.log(await require('./meeterClient').handler({'operation': 'bad', 'payload': {'clientId': 'wbc'}})))();\"",
+        "userGetNoOne": "node -e \"(async () => console.log(await require('./meeterUser').handler({'operation': 'authenticate', 'payload': {'uid': '4090ce40-4d32-474e-8df8-2212e70f5f00'}})))();\"",
+        "userGetDano": "node -e \"(async () => console.log(await require('./meeterUser').handler({'operation': 'authenticate', 'payload': {'uid': '4090ce40-4d32-474e-8df8-2212e70f5fee'}})))();\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.790.0"
+    }
+}
