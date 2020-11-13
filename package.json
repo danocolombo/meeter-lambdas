@@ -8,7 +8,8 @@
         "clientGetWBC": "node -e \"(async () => console.log(await require('./meeterClient').handler({'operation': 'getClient', 'payload': {'clientId': 'wbc'}})))();\"",
         "userBadOperation": "node -e \"(async () => console.log(await require('./meeterClient').handler({'operation': 'bad', 'payload': {'clientId': 'wbc'}})))();\"",
         "userGetNoOne": "node -e \"(async () => console.log(await require('./meeterUser').handler({'operation': 'authenticate', 'payload': {'uid': '4090ce40-4d32-474e-8df8-2212e70f5f00'}})))();\"",
-        "userGetDano": "node -e \"(async () => console.log(await require('./meeterUser').handler({'operation': 'authenticate', 'payload': {'uid': '4090ce40-4d32-474e-8df8-2212e70f5fee'}})))();\""
+        "userGetDano": "node -e \"(async () => console.log(await require('./meeterUser').handler({'operation': 'authenticate', 'payload': {'uid': '4090ce40-4d32-474e-8df8-2212e70f5fee'}})))();\"",
+        "getWBCMeetings": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getFutureMeetings', 'payload': {'clientId': 'wbc'}})))();\""
     },
     "keywords": [],
     "author": "",
