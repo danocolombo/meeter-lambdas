@@ -1,5 +1,6 @@
 var AWS = require('aws-sdk');
 var dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
+const crypto = require('crypto');
 
 /**
  * Meeter Meetings
@@ -8,7 +9,8 @@ var dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 exports.handler = async (event, context, callback) => {
     //console.log('Received event:', JSON.stringify(event, null, 2));
 
-    var operation = event.operation;
+    let operation = event.operation;
+    let meetings = null;
     console.log('operation:' + operation);
     let payload = {
         status: '400',
@@ -20,7 +22,7 @@ exports.handler = async (event, context, callback) => {
     switch (operation) {
         case 'getFutureMeetings':
             // get the Future Meetings for clientId
-            const meetings = await getMeetings(event.payload.clientId);
+            meetings = await getMeetings(event.payload.clientId);
             //==================================
             // should get array of meetings
             //==================================
@@ -31,10 +33,11 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             } else {
                 payload.status = '200';
+                payload.count = meetings.Count;
                 let theMeetings = [];
                 for (let i = 0; i < meetings.Count; i++) {
                     let m = {};
-                    mtg = meetings.Items[i];
+                    let mtg = meetings.Items[i];
                     m._id = mtg.id;
                     m.clientId = mtg.clientId; // required field no need to check
                     if (mtg.meetingDate) m.meetingDate = mtg.meetingDate;
@@ -90,7 +93,38 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             }
             return response;
+        case 'createMeeting':
+            event.payload.TableName = 'meeterMeetings';
 
+            // create unique id
+            let meetingId = crypto.randomBytes(16).toString('base64');
+            event.payload.Item.id = meetingId.toString();
+            let mtg = await dynamo.put(event.payload).promise();
+
+            return mtg;
+            break;
+        case 'getAllMeetings':
+            // get the Future Meetings for clientId
+            meetings = await getMeetings(event.payload.clientId);
+            //==================================
+            // should get array of meetings
+            //==================================
+
+            if (meetings.Count < 1) {
+                payload.status = '400';
+                // payload.body.message = 'no meetings found';
+                return payload;
+            } else {
+                payload.status = '200';
+                payload.count = meetings.Count;
+                let theMeetings = [];
+                for (let i = 0; i < meetings.Count; i++) {
+                    theMeetings.push(meetings.Items[i]);
+                }
+                payload.body = theMeetings;
+                return payload;
+            }
+            return response;
         case 'echo':
             callback(null, 'Success');
             break;
