@@ -20,7 +20,7 @@ exports.handler = async (event, context, callback) => {
     };
     var mData = '';
     switch (operation) {
-        case 'getFutureMeetings':
+        case 'getFutureMeetings1':
             // get the Future Meetings for clientId
             meetings = await getMeetings(event.payload.clientId);
             //==================================
@@ -125,6 +125,88 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             }
             return response;
+        case 'getFutureMeetings':
+            // get the Future Meetings for clientId
+            meetings = await getMeetings(event.payload.clientId);
+            //==================================
+            // should get array of meetings
+            //==================================
+
+            if (meetings.Count < 1) {
+                payload.status = '400';
+                // payload.body.message = 'no meetings found';
+                return payload;
+            } else {
+                // get todays date
+                let d = new Date();
+                var n = d.toISOString();
+                let fullDate = n.split('T');
+                let today = fullDate[0];
+
+                payload.status = '200';
+                payload.aFilterDate = today;
+                let filterCnt = 0;
+                let theMeetings = [];
+                for (let i = 0; i < meetings.Count; i++) {
+                    let m = meetings.Items[i];
+                    if (m.meetingDate >= today) {
+                        filterCnt++;
+                        theMeetings.push(meetings.Items[i]);
+                    }
+                }
+
+                if (filterCnt > 0) {
+                    let sortedMeetings = [];
+                    theMeetings.sort(GetAscendSortOrder('meetingDate')); //sorts based on date, latest first
+                    payload.body = theMeetings;
+                } else {
+                    payload.body = {};
+                }
+                payload.count = filterCnt;
+                return payload;
+            }
+            return response;
+        case 'getHistoricMeetings':
+            // get the Historic Meetings for clientId
+            meetings = await getMeetings(event.payload.clientId);
+            //==================================
+            // should get array of meetings
+            //==================================
+
+            if (meetings.Count < 1) {
+                payload.status = '400';
+                // payload.body.message = 'no meetings found';
+                return payload;
+            } else {
+                // get todays date
+                let d = new Date();
+                var n = d.toISOString();
+                let fullDate = n.split('T');
+                let today = fullDate[0];
+
+                payload.status = '200';
+                payload.aFilterDate = today;
+                let filterCnt = 0;
+                let theMeetings = [];
+                for (let i = 0; i < meetings.Count; i++) {
+                    let m = meetings.Items[i];
+                    if (m.meetingDate < today) {
+                        filterCnt++;
+                        theMeetings.push(meetings.Items[i]);
+                    }
+                }
+
+                if (filterCnt > 0) {
+                    let sortedMeetings = [];
+                    theMeetings.sort(GetSortOrder('meetingDate')); //sorts based on date, latest first
+                    payload.body = theMeetings;
+                } else {
+                    payload.body = {};
+                }
+
+                return payload;
+            }
+            return response;
         case 'echo':
             callback(null, 'Success');
             break;
@@ -156,4 +238,25 @@ async function getMeetings(var1) {
     } catch (err) {
         console.log('FAILURE in dynamoDB call', err.message);
     }
+}
+//Comparer Function
+function GetSortOrder(prop) {
+    return function (a, b) {
+        if (a[prop] < b[prop]) {
+            return 1;
+        } else if (a[prop] > b[prop]) {
+            return -1;
+        }
+        return 0;
+    };
+}
+function GetAscendSortOrder(prop) {
+    return function (a, b) {
+        if (a[prop] > b[prop]) {
+            return 1;
+        } else if (a[prop] < b[prop]) {
+            return -1;
+        }
+        return 0;
+    };
 }
