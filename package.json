@@ -13,7 +13,11 @@
         "addTestMeeting": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'createMeeting','payload': {'Item': {'clientId': 'test','meetingDate': '2020-11-15','meetingType': 'TEST','supportRole': 'Dano','title': 'addTestMeeting'}}})))();\"",
         "getAllMeetings": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getAllMeetings', 'payload': {'clientId': 'wbc'}})))();\"",
         "getWBCFutures": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getFutureMeetings', 'payload': {'clientId': 'wbc'}})))();\"",
-        "getWBCHistory": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getHistoricMeetings', 'payload': {'clientId': 'wbc'}})))();\""
+        "getWBCHistory": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getHistoricMeetings', 'payload': {'clientId': 'wbc'}})))();\"",
+        "getDanoByNameAtWynnbrook": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByNameAndClient', 'payload': {'clientId': 'wbc','name': 'Dano Colombo'}})))();\"",
+        "getDanoAtWynnbrookById": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByIdAndClient', 'payload': {'id': '95228bede5d802651334175a7179e1d0','clientId': 'wbc'}})))();\"",
+        "getDanoByName": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByName', 'payload': {'name': 'Dano Colombo'}})))();\"",
+        "getWynnbrookPeeps": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getAllPeoleByClient', 'payload': {'clientId': 'wbc'}})))();\""
     },
     "keywords": [],
     "author": "",
