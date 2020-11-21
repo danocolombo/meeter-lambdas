@@ -207,6 +207,32 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             }
             return response;
+        case 'getMeetingByIdAndClient':
+            // get the specific meeting
+            meetings = await getMeetingByIdAndClient(
+                event.payload.id,
+                event.payload.clientId
+            );
+            //==================================
+            // should get the meeting
+            //==================================
+            if (meetings.Count < 1) {
+                payload.status = '400';
+                // payload.body.message = 'no meetings found';
+                return payload;
+            } else {
+                payload.status = '200';
+                payload.count = meetings.Count;
+                let theMeetings = [];
+                for (let i = 0; i < meetings.Count; i++) {
+                    theMeetings.push(meetings.Items[i]);
+                }
+                payload.body = theMeetings;
+                return payload;
+            }
+            return response;
+
+            return response;
         case 'echo':
             callback(null, 'Success');
             break;
@@ -259,4 +285,22 @@ function GetAscendSortOrder(prop) {
         }
         return 0;
     };
+}
+async function getMeetingByIdAndClient(var1, var2) {
+    const uParams = {
+        TableName: 'meeterMeetings',
+        KeyConditionExpression: 'id = :v_id and clientId = :v_clientId',
+        ExpressionAttributeValues: {
+            ':v_id': var1,
+            ':v_clientId': var2,
+        },
+    };
+    try {
+        // console.log('BEFORE dynamo query');
+        const data = await dynamo.query(uParams).promise();
+        // console.log(data);
+        return data;
+    } catch (err) {
+        console.log('FAILURE in dynamoDB call', err.message);
+    }
 }
