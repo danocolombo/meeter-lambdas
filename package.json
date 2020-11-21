@@ -18,7 +18,9 @@
         "getDanoByNameAtWynnbrook": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByNameAndClient', 'payload': {'clientId': 'wbc','name': 'Dano Colombo'}})))();\"",
         "getDanoAtWynnbrookById": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByIdAndClient', 'payload': {'id': '95228bede5d802651334175a7179e1d0','clientId': 'wbc'}})))();\"",
         "getDanoByName": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByName', 'payload': {'name': 'Dano Colombo'}})))();\"",
-        "getWynnbrookPeeps": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getAllPeoleByClient', 'payload': {'clientId': 'wbc'}})))();\""
+        "getWynnbrookPeeps": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getAllPeoleByClient', 'payload': {'clientId': 'wbc'}})))();\"",
+        "getGroupById": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupById', 'payload': {'groupId': '3a822c59000e4a4f4a3c71f68e706671'}})))();\"",
+        "getGroupById-FAIL": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupById', 'payload': {'groupId': '3a822c59000e4a4f4a3c71f68e70667A'}})))();\""
     },
     "keywords": [],
     "author": "",
