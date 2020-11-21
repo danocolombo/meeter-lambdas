@@ -227,7 +227,8 @@ exports.handler = async (event, context, callback) => {
                 for (let i = 0; i < meetings.Count; i++) {
                     theMeetings.push(meetings.Items[i]);
                 }
-                payload.body = theMeetings;
+                //payload.body = theMeetings;
+                payload.body = meetings.Items[0];
                 return payload;
             }
             return response;
