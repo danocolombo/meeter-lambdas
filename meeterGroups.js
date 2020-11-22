@@ -36,6 +36,27 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             }
             return response;
+        case 'getGroupsByMeetingId':
+            // get groups for the meetingId
+            groups = await getGroupsByMeetingId(event.payload.meetingId);
+            //==================================
+            // should get array of groups
+            //==================================
+
+            if (groups.Count < 1) {
+                payload.status = '400';
+                return payload;
+            } else {
+                payload.status = '200';
+                payload.count = groups.Count;
+                let theGroups = [];
+                for (let i = 0; i < groups.Count; i++) {
+                    theGroups.push(groups.Items[i]);
+                }
+                payload.body = theGroups;
+                return payload;
+            }
+            return response;
         case 'echo':
             callback(null, 'Success');
             break;
@@ -60,6 +81,24 @@ async function getGroupById(var1) {
     try {
         // console.log('BEFORE dynamo query');
         const data = await dynamo.query(uParams).promise();
+        // console.log(data);
+        return data;
+    } catch (err) {
+        console.log('FAILURE in dynamoDB call', err.message);
+    }
+}
+async function getGroupsByMeetingId(var1) {
+    const mParams = {
+        TableName: 'meeterGroups',
+        IndexName: 'meetingId-index',
+        KeyConditionExpression: 'meetingId = :v_id',
+        ExpressionAttributeValues: {
+            ':v_id': var1,
+        },
+    };
+    try {
+        // console.log('BEFORE dynamo query');
+        const data = await dynamo.query(mParams).promise();
         // console.log(data);
         return data;
     } catch (err) {
