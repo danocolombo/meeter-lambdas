@@ -19,9 +19,12 @@
         "getDanoAtWynnbrookById": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByIdAndClient', 'payload': {'id': '95228bede5d802651334175a7179e1d0','clientId': 'wbc'}})))();\"",
         "getDanoByName": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByName', 'payload': {'name': 'Dano Colombo'}})))();\"",
         "getWynnbrookPeeps": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getAllPeoleByClient', 'payload': {'clientId': 'wbc'}})))();\"",
-        "getGroupById": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupById', 'payload': {'groupId': '3a822c59000e4a4f4a3c71f68e706671'}})))();\"",
-        "getGroupById-FAIL": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupById', 'payload': {'groupId': '3a822c59000e4a4f4a3c71f68e70667A'}})))();\"",
-        "getGroupsByMeetingId": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupsByMeetingId', 'payload': {'meetingId': '6a1d95fd7d5c96267e62197d96c1c744'}})))();\""
+        "getGroupById": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupById', 'payload': {'groupId': '2c9d87bc48946bbcc30b47c3e92477c5'}})))();\"",
+        "1getGroupByIdAndFAIL": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupById', 'payload': {'groupId': '3a822c59000e4a4f4a3c71f68e70667A'}})))();\"",
+        "getGroupsByMeetingId": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'getGroupsByMeetingId', 'payload': {'meetingId': '6a1d95fd7d5c96267e62197d96c1c744'}})))();\"",
+        "addAGroup": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'addGroup', 'payload': {'Item':{'meetingId': '6a1d95fd7d5c96267e62197d96c1c744','clientId':'wbc','title':'test'}}})))();\"",
+        "updateGroup": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'updateGroup', 'payload': {'Item':{'id': 'f64a33eac403de0ce4eb7c136562506c', 'meetingId': '6a1d95fd7d5c96267e62197d96c1c744','clientId':'wbc','title':'updated title'}}})))();\"",
+        "deleteGroup": "node -e \"(async () => console.log(await require('./meeterGroups').handler({'operation': 'deleteGroup', 'payload': {'Key':{'id': '2c9d87bc48946bbcc30b47c3e92477c5', 'clientId': 'wbc'}}})))();\""
     },
     "keywords": [],
     "author": "",

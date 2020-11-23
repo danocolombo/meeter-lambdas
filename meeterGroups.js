@@ -1,6 +1,6 @@
 var AWS = require('aws-sdk');
-var dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 const crypto = require('crypto');
+var dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
 /**
  * Meeter Groups
@@ -11,6 +11,7 @@ exports.handler = async (event, context, callback) => {
 
     let operation = event.operation;
     let groups = null;
+    let requirementsMet = null;
     console.log('operation:' + operation);
     let payload = {
         status: '400',
@@ -42,7 +43,6 @@ exports.handler = async (event, context, callback) => {
             //==================================
             // should get array of groups
             //==================================
-
             if (groups.Count < 1) {
                 payload.status = '400';
                 return payload;
@@ -57,6 +57,132 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             }
             return response;
+        case 'addGroup':
+            //========================================
+            // this will verify minimal data and add
+            //========================================
+            // REQUIRED:
+            //---------------------
+            // clientId
+            // meetingId
+            // title
+            //---------------------
+            requirementsMet = true;
+            if (!event.payload.Item.hasOwnProperty('clientId')) {
+                requirementsMet = false;
+            }
+            if (!event.payload.Item.hasOwnProperty('meetingId')) {
+                requirementsMet = false;
+            }
+            if (!event.payload.Item.hasOwnProperty('title')) {
+                requirementsMet = false;
+            }
+            if (requirementsMet) {
+                event.payload.TableName = 'meeterGroups';
+                let newId = getUniqueId();
+                event.payload.Item.id = newId;
+                //return event.payload;
+                // let g = await dynamo.put(event.payload).promise();
+                let g = null;
+                try {
+                    g = await dynamo.put(event.payload).promise();
+                    return event.payload;
+                } catch (error) {
+                    return g;
+                }
+            } else {
+                payload.status = '406';
+                payload.body.message =
+                    'Meeter: Request Not Acceptable. (' +
+                    operation +
+                    ') Requirements Not Met';
+                return payload;
+            }
+        case 'updateGroup':
+            //========================================
+            // this will verify minimal data and update
+            //========================================
+            // REQUIRED:
+            //---------------------
+            // id
+            // clientId
+            // meetingId
+            // title
+            //---------------------
+            requirementsMet = true;
+            if (!event.payload.Item.hasOwnProperty('id')) {
+                requirementsMet = false;
+            }
+            if (!event.payload.Item.hasOwnProperty('clientId')) {
+                requirementsMet = false;
+            }
+            if (!event.payload.Item.hasOwnProperty('meetingId')) {
+                requirementsMet = false;
+            }
+            if (!event.payload.Item.hasOwnProperty('title')) {
+                requirementsMet = false;
+            }
+            if (requirementsMet) {
+                event.payload.TableName = 'meeterGroups';
+                // let g = await dynamo.put(event.payload).promise();
+                let g = null;
+                try {
+                    g = await dynamo.put(event.payload).promise();
+                    return event.payload;
+                } catch (error) {
+                    return g;
+                }
+            } else {
+                payload.status = '406';
+                payload.body.message =
+                    'Meeter: Request Not Acceptable. (' +
+                    operation +
+                    ') Requirements Not Met';
+                return payload;
+            }
+        case 'deleteGroup':
+            //=======================================
+            // deleting group
+            // REQUIRED:
+            //---------------------
+            // id
+            // clientId
+            // meetingId
+            //=======================================
+            requirementsMet = true;
+            if (!event.payload.Key.hasOwnProperty('id')) {
+                requirementsMet = false;
+            }
+            if (!event.payload.Key.hasOwnProperty('clientId')) {
+                requirementsMet = false;
+            }
+            // if (!event.payload.Item.hasOwnProperty('meetingId')) {
+            //     requirementsMet = false;
+            // }
+            if (requirementsMet) {
+                event.payload.TableName = 'meeterGroups';
+                let g = null;
+                try {
+                    g = await dynamo.delete(event.payload).promise();
+                    return event.payload;
+                } catch (error) {
+                    let returnMsg =
+                        'Error Deleting: ' +
+                        error +
+                        '\n ' +
+                        g +
+                        '\n' +
+                        event.payload;
+                    return returnMsg;
+                }
+            } else {
+                payload.status = '406';
+                payload.body.message =
+                    'Meeter: Request Not Acceptable. (' +
+                    operation +
+                    ') Requirements Not Met';
+                return payload;
+            }
         case 'echo':
             callback(null, 'Success');
             break;
@@ -104,4 +230,21 @@ async function getGroupsByMeetingId(var1) {
     } catch (err) {
         console.log('FAILURE in dynamoDB call', err.message);
     }
+}
+
+function getUniqueId() {
+    //this generates a unique ID based on this specific time
+    // Difining algorithm
+    const algorithm = 'aes-256-cbc';
+    // Defining key
+    const key = crypto.randomBytes(32);
+    // Defining iv
+    const iv = crypto.randomBytes(16);
+    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+    //get the current time...
+    let n = Date.now();
+    let encrypted = cipher.update(n.toString());
+    // Using concatenation
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return encrypted.toString('hex');
 }
