@@ -44,7 +44,7 @@ exports.handler = async (event, context, callback) => {
             );
             if (configs) {
                 payload.status = '200';
-                payload.body = JSON.stringify(configs);
+                payload.body = configs;
                 return payload;
             } else {
                 payload.status = '400';
