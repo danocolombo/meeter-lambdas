@@ -62,6 +62,36 @@ exports.handler = async (event, context, callback) => {
                 payload.status = '400';
                 return payload;
             }
+        case 'updateMeetingConfig':
+            //this will change the configuration value
+            const toggledConfigs = await updateMeetingConfig(
+                event.payload.clientId,
+                event.payload.config,
+                event.payload.value
+            );
+            if (toggledConfigs) {
+                payload.status = '200';
+                payload.body = toggledConfigs;
+                return payload;
+            } else {
+                payload.status = '400';
+                return payload;
+            }
+        case 'updateMeeterConfigs':
+            //this will change the configuration value
+            const nConfigs = await updateMeeterConfigs(
+                event.payload.clientId,
+                event.payload.config,
+                event.payload.setting
+            );
+            if (nConfigs) {
+                payload.status = '200';
+                payload.body = nConfigs;
+                return payload;
+            } else {
+                payload.status = '400';
+                return payload;
+            }
         case 'echo':
             callback(null, 'Success');
             break;
@@ -88,26 +118,21 @@ async function getClient(var1) {
 }
 //get the configurations for a client
 async function getClientMeetingConfigs(var1) {
-    const tParams = {
-        TableName: 'meeterClientProfiles',
-        KeyConditionExpression: 'clientId = :v_clientId',
+    const mParams = {
+        TableName: 'meeterConfigs',
+        IndexName: 'clientId-index',
+        KeyConditionExpression: 'clientId = :v_client',
         ExpressionAttributeValues: {
-            ':v_clientId': var1,
+            ':v_client': var1,
         },
     };
     try {
         // console.log('BEFORE dynamo query');
-        const clientRecord = await dynamo.query(tParams).promise();
-        let allConfigs = clientRecord.Items[0].mConfigs;
+        const data = await dynamo.query(mParams).promise();
         let configs = {};
-        // console.log('LENGTH: ' + allConfigs.length);
-        for (let i = 0; i < allConfigs.length; i++) {
-            configs[allConfigs[i].config] = allConfigs[i].value;
+        for (let i = 0; i < data.Items.length; i++) {
+            configs[data.Items[i].config] = data.Items[i].setting;
         }
-
-        // console.log('\n\n========================\n');
-        // console.log(JSON.stringify(configs));
-        // console.log('\n\n========================\n');
         return configs;
     } catch (err) {
         console.log('FAILURE in dynamoDB call', err.message);
@@ -167,4 +192,26 @@ async function getAuth(uid, clientId) {
     } catch (err) {
         console.log('FAILURE in dynamoDB call', err.message);
     }
+}
+// updateMeeterConfigs
+async function updateMeeterConfigs(var1, var2, var3) {
+    let newSetting = null;
+    if (var3 === 'true') {
+        newSetting = true;
+    } else {
+        newSetting = false;
+    }
+    //var1=clientId, var2=config, var3=value
+    //===========================================
+    const params = {
+        TableName: 'meeterConfigs',
+        Key: { clientId: var1, config: var2 },
+        UpdateExpression: `set setting = :newValue`,
+        ExpressionAttributeValues: {
+            ':newValue': newSetting,
+        },
+        ReturnValues: 'ALL_NEW',
+    };
+    const response = await dynamo.update(params).promise();
+    return response;
 }
