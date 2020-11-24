@@ -50,6 +50,18 @@ exports.handler = async (event, context, callback) => {
                 payload.status = '400';
                 return payload;
             }
+        case 'getDefaultGroups':
+            const defaultGroups = await getDefaultGroups(
+                event.payload.clientId
+            );
+            if (defaultGroups) {
+                payload.status = '200';
+                payload.body = defaultGroups;
+                return payload;
+            } else {
+                payload.status = '400';
+                return payload;
+            }
         case 'echo':
             callback(null, 'Success');
             break;
@@ -97,6 +109,33 @@ async function getClientMeetingConfigs(var1) {
         // console.log(JSON.stringify(configs));
         // console.log('\n\n========================\n');
         return configs;
+    } catch (err) {
+        console.log('FAILURE in dynamoDB call', err.message);
+    }
+}
+//get the defaultGroups for a client
+async function getDefaultGroups(var1) {
+    const tParams = {
+        TableName: 'meeterClientProfiles',
+        KeyConditionExpression: 'clientId = :v_clientId',
+        ExpressionAttributeValues: {
+            ':v_clientId': var1,
+        },
+    };
+    try {
+        // console.log('BEFORE dynamo query');
+        const clientRecord = await dynamo.query(tParams).promise();
+        let allGroups = clientRecord.Items[0].defaultGroups;
+        // let dGroups = {};
+        // // console.log('LENGTH: ' + allGroups.length);
+        // for (let i = 0; i < allGroups.length; i++) {
+        //     dGroups[allGroups[i].config] = dGroups[i].value;
+        // }
+
+        // console.log('\n\n========================\n');
+        // console.log(JSON.stringify(dGroups));
+        // console.log('\n\n========================\n');
+        return allGroups;
     } catch (err) {
         console.log('FAILURE in dynamoDB call', err.message);
     }
