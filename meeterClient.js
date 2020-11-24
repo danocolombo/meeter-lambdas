@@ -15,7 +15,12 @@ exports.handler = async (event, context, callback) => {
     var operation = event.operation;
 
     event.payload.TableName = 'meeterClientProfiles';
-
+    let payload = {
+        status: '400',
+        body: {
+            // message: 'Meeter System Error',
+        },
+    };
     switch (operation) {
         case 'getClient':
             const requestedClient = await getClient(event.payload.clientId);
@@ -33,7 +38,18 @@ exports.handler = async (event, context, callback) => {
             );
             return requestedAuth;
             break;
-
+        case 'getConfigs':
+            const configs = await getClientMeetingConfigs(
+                event.payload.clientId
+            );
+            if (configs) {
+                payload.status = '200';
+                payload.body = JSON.stringify(configs);
+                return payload;
+            } else {
+                payload.status = '400';
+                return payload;
+            }
         case 'echo':
             callback(null, 'Success');
             break;
@@ -42,7 +58,6 @@ exports.handler = async (event, context, callback) => {
     }
 };
 async function getClient(var1) {
-    //return var1 + var2;
     const tParams = {
         TableName: 'meeterClientProfiles',
         KeyConditionExpression: 'clientId = :v_clientId',
@@ -55,6 +70,33 @@ async function getClient(var1) {
         const data = await dynamo.query(tParams).promise();
         // console.log(data);
         return data;
+    } catch (err) {
+        console.log('FAILURE in dynamoDB call', err.message);
+    }
+}
+//get the configurations for a client
+async function getClientMeetingConfigs(var1) {
+    const tParams = {
+        TableName: 'meeterClientProfiles',
+        KeyConditionExpression: 'clientId = :v_clientId',
+        ExpressionAttributeValues: {
+            ':v_clientId': var1,
+        },
+    };
+    try {
+        // console.log('BEFORE dynamo query');
+        const clientRecord = await dynamo.query(tParams).promise();
+        let allConfigs = clientRecord.Items[0].mConfigs;
+        let configs = {};
+        // console.log('LENGTH: ' + allConfigs.length);
+        for (let i = 0; i < allConfigs.length; i++) {
+            configs[allConfigs[i].config] = allConfigs[i].value;
+        }
+
+        // console.log('\n\n========================\n');
+        // console.log(JSON.stringify(configs));
+        // console.log('\n\n========================\n');
+        return configs;
     } catch (err) {
         console.log('FAILURE in dynamoDB call', err.message);
     }
