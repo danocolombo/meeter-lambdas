@@ -103,6 +103,11 @@ exports.handler = async (event, context, callback) => {
 
             return mtg;
             break;
+        case 'putMeeting':
+            event.payload.TableName = 'meeterMeetings';
+            let putMeeting = await dynamo.put(event.payload).promise();
+            return putMeeting;
+            break;
         case 'getAllMeetings':
             // get the Future Meetings for clientId
             meetings = await getMeetings(event.payload.clientId);

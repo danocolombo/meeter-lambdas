@@ -37,6 +37,18 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             }
             return response;
+        case 'addGroup':
+            let grpId = getUniqueId();
+            event.payload.Item.id = grpId;
+            let nGroup = await dynamo.put(event.payload).promise();
+            if (nGroup.Count < 1) {
+                payload.status = '400';
+                return payload;
+            } else {
+                payload.status = '200';
+                payload.body = nGroup;
+                return payload;
+            }
         case 'getGroupsByMeetingId':
             // get groups for the meetingId
             groups = await getGroupsByMeetingId(event.payload.meetingId);
