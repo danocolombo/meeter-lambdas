@@ -37,7 +37,7 @@ exports.handler = async (event, context, callback) => {
                 return payload;
             }
             return response;
-        case 'addGroup':
+        case 'addGroupAbbrev':
             let grpId = getUniqueId();
             event.payload.Item.id = grpId;
             let nGroup = await dynamo.put(event.payload).promise();
