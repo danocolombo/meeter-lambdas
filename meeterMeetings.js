@@ -11,6 +11,7 @@ exports.handler = async (event, context, callback) => {
 
     let operation = event.operation;
     let meetings = null;
+    let requirementsMet = null;
     console.log('operation:' + operation);
     let payload = {
         status: '400',
@@ -104,10 +105,46 @@ exports.handler = async (event, context, callback) => {
             return mtg;
             break;
         case 'putMeeting':
-            event.payload.TableName = 'meeterMeetings';
-            let putMeeting = await dynamo.put(event.payload).promise();
-            return putMeeting;
-            break;
+            //--------------------------
+            // required fields:
+            // id, clientId, meetingDate, meetingType, title
+            //--------------------------
+            requirementsMet = true;
+            if(!event.payload.Item.hasOwnProperty('id')){
+                requirementsMet = false;
+            }
+            if(!event.payload.Item.hasOwnProperty('clientId')){
+                requirementsMet = false;
+            }
+            if(!event.payload.Item.hasOwnProperty('meetingDate')){
+                requirementsMet = false;
+            }
+            if(!event.payload.Item.hasOwnProperty('meetingType')){
+                requirementsMet = false;
+            }
+            if(!event.payload.Item.hasOwnProperty('title')){
+                requirementsMet = false;
+            }
+            if (requirementsMet){
+                event.payload.TableName = 'meeterMeetings';
+                if (event.payload.Item.id === '0'){
+                    let newId = getUniqueId();
+                    event.payload.Item.id = newId;
+                }
+                let meetingResponse = null;
+                try {
+                    meetingResponse = await dynamo.put(event.payload).promise();
+                    return event.payload;
+                }catch{
+                    return meetingResponse;
+                }
+            } else {
+                payload.status = '406';
+                payload.body.message = 'Meeter: Request Not Acceptable. (' +
+                operation +
+                ') Requirements Not Met';
+                return payload;
+            }
         case 'getAllMeetings':
             // get the Future Meetings for clientId
             meetings = await getMeetings(event.payload.clientId);
@@ -309,4 +346,20 @@ async function getMeetingByIdAndClient(var1, var2) {
     } catch (err) {
         console.log('FAILURE in dynamoDB call', err.message);
     }
+}
+function getUniqueId() {
+    //this generates a unique ID based on this specific time
+    // Difining algorithm
+    const algorithm = 'aes-256-cbc';
+    // Defining key
+    const key = crypto.randomBytes(32);
+    // Defining iv
+    const iv = crypto.randomBytes(16);
+    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+    //get the current time...
+    let n = Date.now();
+    let encrypted = cipher.update(n.toString());
+    // Using concatenation
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return encrypted.toString('hex');
 }

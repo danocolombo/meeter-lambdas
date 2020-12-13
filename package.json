@@ -13,7 +13,7 @@
         "getWBCMeetings": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getAllMeetings', 'payload': {'clientId': 'wbc'}})))();\"",
         "addTestMeeting": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'createMeeting','payload': {'Item': {'clientId': 'test','meetingDate': '2020-11-15','meetingType': 'TEST','supportRole': 'Dano','title': 'addTestMeeting'}}})))();\"",
         "getAllMeetings": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getAllMeetings', 'payload': {'clientId': 'wbc'}})))();\"",
-        "putMeeting": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'putMeeting', 'payload': {'cafeCoordinator': 'TBD', 'clientId': 'wbc', 'facilitator': 'TBD', 'mealCoordinator': 'TBD', 'meetingDate': '2020-12-14', 'meetingId': '5ef918623598c666597b3b4e', 'meetingType': 'Testimony', 'title': 'TBD'}})))();\"",
+        "putMeeting": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'putMeeting', 'payload': {'Item': {'cafeCoordinator': 'TBD', 'clientId': 'test', 'facilitator': 'TBD', 'mealCoordinator': 'TBD', 'meetingDate': '2020-12-14', 'id': '0bbc1641abbad6183d6cc948d27eb40d', 'meetingType': 'Testimony', 'title': 'TBD'}}})))();\"",
         "getWBCFutures": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getFutureMeetings', 'payload': {'clientId': 'wbc'}})))();\"",
         "getWBCHistory": "node -e \"(async () => console.log(await require('./meeterMeetings').handler({'operation': 'getHistoricMeetings', 'payload': {'clientId': 'wbc'}})))();\"",
         "getDanoByNameAtWynnbrook": "node -e \"(async () => console.log(await require('./meeterPeople').handler({'operation': 'getPeopleByNameAndClient', 'payload': {'clientId': 'wbc','name': 'Dano Colombo'}})))();\"",
@@ -34,6 +34,6 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "aws-sdk": "^2.790.0"
+        "aws-sdk": "^2.809.0"
     }
 }
