@@ -1,6 +1,6 @@
 # meeter-lambdas
 
-These are a variety of lambda functions used to support the meeter application.
+These are a variety of lambda functions used to support the P8 Rally application.
 These are all based on the programmitic access of the user. (AWS-CLI required);
 
 ## run tests
